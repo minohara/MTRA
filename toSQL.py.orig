@@ -1,0 +1,65 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jan 19 14:27:54 2021
+
+@author: tomon
+"""
+
+# MySQLdb をインポート
+import MySQLdb
+
+
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+# URL関連
+top_url = "https://cinemacity.co.jp/"
+url = "https://res.cinemacity.co.jp/TicketReserver/studio/program/2002/253306"
+# ヘッドレスモードを設定
+options = Options()
+options.add_argument('--headless')
+# Chromeを起動
+driver = webdriver.Chrome(executable_path="C:\webdriver\chromedriver.exe", options=options)
+# 一度トップページに行きCookieを取得
+driver.get(top_url)
+driver.get_cookies()
+driver.get(url)
+# soupオブジェクトを作成
+soup = BeautifulSoup(driver.page_source, "lxml")
+ary = []
+for seat in soup.find_all("div", class_="unclickable"):
+    
+  ary.append(seat.get('id'))
+
+# データベース接続とカーソル生成
+conn = MySQLdb.connect(
+ user='root',
+ passwd='8013',
+ host='localhost',
+ db='sample_db',
+ charset='utf8')
+cursor=conn.cursor()
+
+# エラー処理（例外処理）
+try:
+    # CREATE
+    # id, name だけのシンプルなテーブルを作成。id を主キーに設定。
+    cursor.execute("DROP TABLE IF EXISTS `sample`")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS `sample` (
+    `id` int(11) NOT NULL,
+    `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+    PRIMARY KEY (id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci""")
+
+    #座席情報登録 
+    cursor.execute("INSERT INTO sample VALUES ('%s', '%s')" , (1, ary))
+
+except MySQLdb.Error as e:
+    print('MySQLdb.Error: ', e)
+    
+conn.commit()
+conn.close()
+ 
+# print(ary)
+# Chromeドライバーを終了
+driver.close()
