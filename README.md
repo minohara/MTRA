@@ -121,4 +121,6 @@ insert into screen(name) values ("a studio");
 
 insert into seat(`screen_id`, `row`, `column`, `pos_x`, `pos_y`, `pos_z`) values (1, "B",  5, -13,   1,   0);
 
+
+select seat_id, count(*) from reservation group by seat_id order by count(*) desc into outfile 'rserved.csv' fields terminated by ',';
 ```
