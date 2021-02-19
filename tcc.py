@@ -117,3 +117,4 @@ conn.commit()
 conn.close()
 # webdriverを終了
 driver.close()
+driver.quit()
