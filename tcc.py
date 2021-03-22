@@ -92,6 +92,7 @@ try:
         movie = BeautifulSoup(driver.page_source, "lxml")
         # 映画情報(タイトル)をデータベースに登録
         title = movie.find("span", class_="movie-title").string
+        title = title.replace("'", "\\'")
         print(title)
         cursor=conn.cursor()
         cursor.execute("""INSERT IGNORE INTO `movie`(`title`)
