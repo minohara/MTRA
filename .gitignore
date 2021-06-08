@@ -2,3 +2,4 @@ Elapse
 *.class
 stcc.sh
 *.csv
+*.csv-

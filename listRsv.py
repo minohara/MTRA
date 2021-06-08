@@ -15,10 +15,12 @@ conn = MySQLdb.connect(
 try:
     cursor=conn.cursor()
     cursor.execute("select * from screen;")
+    scrn_name = []
     print("ID  Name")
     for scrn in cursor.fetchall():
+        scrn_name.append(scrn[1])
         print("%2d. %s" % scrn)
-    scrn_id = int(input(">>> Select a screen: "))-1
+    scrn_id = int(input(">>> Select a screen: "))
     cursor.close()
     cursor=conn.cursor()
     cursor.execute("""
@@ -58,6 +60,7 @@ try:
     cursor.close()
     with open("movie--%d-%d.csv"%(movie_id,id), "w") as f:
         f.write("# %s %s\n" % (title, screenings[id][1]))
+        f.write("%d \"%s\"\n" % (len(samples), scrn_name[scrn_id-1]))
         writer = csv.writer(f)
         for sample in samples:
             cursor=conn.cursor()
@@ -69,6 +72,7 @@ try:
             for seat in cursor.fetchall():
                 seats.append( seat[0]+str(seat[1]) )
             print(seats)
+            print(sample[1],screenings[id][0])
             writer.writerow(seats)
             cursor.close()
     f.close()
